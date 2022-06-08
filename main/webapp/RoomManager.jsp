@@ -105,7 +105,7 @@
 	}).on('click', '#roomList', function() { // 객실 선택/수정 
 		$('#btnAppendRoom').text('수정');
 		let str = $(this).find('option:selected').text()
-		let str1 = str.split(', ');
+		let str1 = str.split(' ');
 		$('#roomName').val(str1[0]);
 		$('#roomType').val($.trim(str1[1]));
 		$('#availPerson').val(str1[2]);
@@ -199,8 +199,8 @@
 			let jo = data[i];
 			$('#roomList').append(
 					'<option value=' + jo['roomNum'] + '>' + jo['roomName']
-							+ ', ' + jo['roomType'] + ', ' + jo['availPerson']
-							+ ', ' + jo['fee'] + '</option>');
+							+ ' ' + jo['roomType'] + ' ' + jo['availPerson']
+							+ ' ' + jo['fee'] + '</option>');
 		}
 	}
 </script>

@@ -208,6 +208,7 @@
 				$('#mobile').val(str[7])
 				$('#totalFee').val(str[5])
 			}).on('click', '#roomList', function() {
+		$('#btnBook').text('예약등록');
 		let data = $(this).find('option:selected').text().split(' ');
 		$('#roomName').empty();
 		$('#roomName').val(data[0]);
