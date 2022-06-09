@@ -191,12 +191,11 @@
 			'#bookRoomList', // 예약내역 클릭시
 			function() {
 				$('#btnBook').text('예약수정');
-				let str = $(this).find('option:selected').text().split(', ');
-				$('#reservationID').val(str[0])
-				$('#roomName').val(str[1])
-				$('#roomType').val(str[2])
-				$('#exp_Men').val(str[3])
-				let str1 = str[4].split('~');
+				let str = $(this).find('option:selected').text().split(' ');
+				
+				$('#roomName').val(str[0])
+				$('#roomType').val(str[1])
+				let str1 = str[2].split('~');
 				console.log(str1[0])
 				str1[0] = str1[0].slice(0, 4) + '-' + str1[0].slice(4, 6) + '-'
 						+ str1[0].slice(6, 8);
@@ -204,9 +203,13 @@
 						+ str1[1].slice(6, 8);
 				$('#stayLength1').val(str1[0])
 				$('#stayLength2').val(str1[1])
-				$('#booker').val(str[6])
-				$('#mobile').val(str[7])
-				$('#totalFee').val(str[5])
+				$('#booker').val(str[3])
+				
+				let str2=$(this).find('option:selected').val().split('/');
+				$('#reservationID').val(str2[0])
+				$('#exp_Men').val(str2[1])
+				$('#mobile').val(str2[2])
+				$('#totalFee').val(str2[3])
 			}).on('click', '#roomList', function() {
 		$('#btnBook').text('예약등록');
 		let data = $(this).find('option:selected').text().split(' ');
@@ -354,13 +357,17 @@
 		$('#bookRoomList').empty();
 		for (let i = 0; i < data.length; i++) {
 			let jo = data[i];
-			$('#bookRoomList').append(
-					'<option value=' + jo['reservationID'] + '>'
-							+ jo['reservationID'] + ', ' + jo['roomName']
-							+ ', ' + jo['roomType'] + ', ' + jo['exp_Men']
-							+ ', ' + jo['stayLength'] + ', ' + jo['totalFee']
-							+ ', ' + jo['booker'] + ', ' + jo['mobile']
-							+ '</option>');
+			$('#bookRoomList')
+					.append(
+							'<option value=' + jo['reservationID'] +'/'+jo['exp_Men']+  '/' + jo['totalFee']+ '/'
+							+ jo['mobile']+'>'
+									+ jo['roomName']
+									+ ' '
+									+ jo['roomType']
+									+ ' '
+									+ jo['stayLength']
+									+ ' '
+									+ jo['booker'] + '</option>');
 		}
 	}
 

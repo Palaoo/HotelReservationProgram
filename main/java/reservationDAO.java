@@ -69,7 +69,7 @@ public class reservationDAO {
 		ArrayList<reservationDTO> list = new ArrayList<reservationDTO>(); // DTO
 		try {
 			connDB(); // DB ¿¬°á
-			String query = "select a.roomnum roomNum, a.roomName roomName, a.availPerson availPerson, a.fee fee, b.roomtype roomType from (select * from roomlist e where roomtypenum = (select roomtypenum from roomtypelist where roomtype =?) and e.roomnum not in (select roomnum from reservationlist d where not ((? < substr(d.stayLength,1,8) and ? < substr(d.stayLength,10,17) or (? > substr(d.stayLength,1,8) and ? > substr(d.stayLength,10,17)))))) a, (select roomtype from roomtypelist c where c.roomtype = ?) b where a.availperson >= ?";
+			String query = "select a.roomnum roomNum, a.roomName roomName, a.availPerson availPerson, a.fee fee, b.roomtype roomType from (select * from roomlist e where roomtypenum = (select roomtypenum from roomtypelist where roomtype =?) and e.roomnum not in (select roomnum from reservationlist d where not ((? < substr(d.stayLength,1,8) and ? < substr(d.stayLength,1,8) or (? > substr(d.stayLength,10,17) and ? > substr(d.stayLength,10,17)))))) a, (select roomtype from roomtypelist c where c.roomtype = ?) b where a.availperson >= ?";
 			PreparedStatement pstmt = conn.prepareStatement(query);
 			pstmt.setString(1, rDTO.getRoomType());
 			String[] stayLength = rDTO.getStayLength().split("~");
@@ -124,8 +124,8 @@ public class reservationDAO {
 					+ " from reservationlist a, (select * from roomtypelist where ? = roomtype) b"
 					+ " where substr(a.staylength, 10,17)>=to_char(sysdate,'yyyymmdd')"
 					+ " and a.roomtypenum=b.roomtypenum and not ((? < substr(a.staylength,1,8)"
-					+ " and ? < substr(a.staylength,10,17)) or"
-					+ " (? >substr(a.staylength,1,8) and ? > substr(a.staylength,10,17)))";
+					+ " and ? < substr(a.staylength,1,8)) or"
+					+ " (? >substr(a.staylength,10,17) and ? > substr(a.staylength,10,17)))";
 			PreparedStatement pstmt = conn.prepareStatement(query);
 			String[] stayLength = rDTO.getStayLength().split("~");
 			System.out.println(rDTO.getRoomType() + ' ' + stayLength[0] + ' ' + stayLength[1]);
