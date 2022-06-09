@@ -119,13 +119,13 @@ public class reservationDAO {
 		ArrayList<reservationDTO> list = new ArrayList<reservationDTO>();
 		try {
 			connDB();
-			String query = "select a.reservationid reservationid, a.roomname roomname, b.roomtype roomtype,"
+			String query = "select a.reservationid reservationid, c.roomname roomname, b.roomtype roomtype,"
 					+ " a.exp_men exp_men, a.staylength staylength, a.totalfee totalfee, a.booker booker, a.mobile mobile"
-					+ " from reservationlist a, (select * from roomtypelist where ? = roomtype) b"
+					+ " from reservationlist a, (select * from roomtypelist where ? = roomtype) b, roomlist c"
 					+ " where substr(a.staylength, 10,17)>=to_char(sysdate,'yyyymmdd')"
 					+ " and a.roomtypenum=b.roomtypenum and not ((? < substr(a.staylength,1,8)"
 					+ " and ? < substr(a.staylength,1,8)) or"
-					+ " (? >substr(a.staylength,10,17) and ? > substr(a.staylength,10,17)))";
+					+ " (? >substr(a.staylength,10,17) and ? > substr(a.staylength,10,17))) and c.roomnum=a.roomnum";
 			PreparedStatement pstmt = conn.prepareStatement(query);
 			String[] stayLength = rDTO.getStayLength().split("~");
 			System.out.println(rDTO.getRoomType() + ' ' + stayLength[0] + ' ' + stayLength[1]);

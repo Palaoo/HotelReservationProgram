@@ -45,7 +45,7 @@
 				<div style="width: 70%;" class="input-group mb-3">
 					<input style="width: 200px;" type="text" class="form-control"
 						aria-label="Recipient's username" aria-describedby="basic-addon2"
-						id='searchExp_Men'> <span class="input-group-text">명</span>
+						id='searchExp_Men' value=1> <span class="input-group-text">명</span>
 				</div>
 			</div>
 			<div style="height: auto;" class="p-2">
@@ -82,7 +82,7 @@
 				<div style="width: 70%;" class="input-group mb-3">
 					<input style="width: 200px;" type="text" class="form-control"
 						aria-label="Recipient's username" aria-describedby="basic-addon2"
-						id="reservationID">
+						id="reservationID" readonly>
 				</div>
 			</div>
 			<div class="p-2 input-group flex-nowrap">
@@ -90,7 +90,7 @@
 				<div style="width: 70%;" class="input-group mb-3">
 					<input style="width: 200px;" type="text" class="form-control"
 						aria-label="Recipient's username" aria-describedby="basic-addon2"
-						id="roomName">
+						id="roomName" readonly>
 				</div>
 			</div>
 			<div class="p-2 input-group flex-nowrap">
@@ -98,7 +98,7 @@
 				<div style="width: 70%;" class="input-group mb-3">
 					<input style="width: 200px;" type="text" class="form-control"
 						aria-label="Recipient's username" aria-describedby="basic-addon2"
-						id="roomType">
+						id="roomType" readonly>
 				</div>
 			</div>
 			<div class="p-2 input-group flex-nowrap">
@@ -140,7 +140,7 @@
 				<div style="width: 70%;" class="input-group mb-3">
 					<input style="width: 200px;" type="text" class="form-control"
 						aria-label="Recipient's username" aria-describedby="basic-addon2"
-						id="totalFee"> <span class="input-group-text">원</span>
+						id="totalFee" readonly> <span class="input-group-text">원</span>
 				</div>
 			</div>
 			<div class="p-2">
@@ -179,6 +179,11 @@
 			'click',
 			'#btnSearchAvailRoom',
 			function() { // 예약가능 room 찾기 버튼
+				if (validDate()) {
+					alert('기간설정 오류')
+					return;
+				}
+
 				let str = $('#searchStayLength1').val().split('-');
 				let str1 = str[0] + str[1] + str[2];
 				str = $('#searchStayLength2').val().split('-');
@@ -192,7 +197,7 @@
 			function() {
 				$('#btnBook').text('예약수정');
 				let str = $(this).find('option:selected').text().split(' ');
-				
+
 				$('#roomName').val(str[0])
 				$('#roomType').val(str[1])
 				let str1 = str[2].split('~');
@@ -204,13 +209,14 @@
 				$('#stayLength1').val(str1[0])
 				$('#stayLength2').val(str1[1])
 				$('#booker').val(str[3])
-				
-				let str2=$(this).find('option:selected').val().split('/');
+
+				let str2 = $(this).find('option:selected').val().split('/');
 				$('#reservationID').val(str2[0])
 				$('#exp_Men').val(str2[1])
-				$('#mobile').val(str2[2])
-				$('#totalFee').val(str2[3])
+				$('#mobile').val(str2[3])
+				$('#totalFee').val(str2[2])
 			}).on('click', '#roomList', function() {
+		$('#btnReset').trigger('click');
 		$('#btnBook').text('예약등록');
 		let data = $(this).find('option:selected').text().split(' ');
 		$('#roomName').empty();
@@ -228,7 +234,11 @@
 		$('#totalFee').val(data[3] * dateDays);
 		$('#stayLength1').val($('#searchStayLength1').val())
 		$('#stayLength2').val($('#searchStayLength2').val())
-	}).on('click', '#btnBook', function() { // 예약등록
+	}).on('click', '#btnBook', function() { // 예약등록 || 예약수정
+		if (validReservation()) {
+			alert('숙박예정인원, 예약자, 모바일번호를 입력해주세요')
+			return;
+		}
 		if ($('#btnBook').text() == '예약등록')
 			appendReservation();
 		else
@@ -249,23 +259,27 @@
 	})
 
 	function updateReservation() {
-		$.ajax({
-			type : 'get',
-			url : 'updateReservation',
-			data : {
-				reservationID : $('#reservationID').val(),
-				exp_Men : $('#exp_Men').val(),
-				stayLength : preTreat(),
-				booker : $('#booker').val(),
-				mobile : $('#mobile').val()
-			},
-			success : function() {
-				init();
-				$('#btnReset').trigger('click');
-			},
-			error : function() {
-			}
-		})
+		if ($('#roomList option:selected').text().split()[2] >= $('#exp_Men')
+				.val())
+			$.ajax({
+				type : 'get',
+				url : 'updateReservation',
+				data : {
+					reservationID : $('#reservationID').val(),
+					exp_Men : $('#exp_Men').val(),
+					stayLength : preTreat(),
+					booker : $('#booker').val(),
+					mobile : $('#mobile').val()
+				},
+				success : function() {
+					init();
+					$('#btnReset').trigger('click');
+				},
+				error : function() {
+				}
+			})
+		else
+			alert('숙박가능인원을 초과했습니다.')
 	}
 
 	function cancelReservation() {
@@ -284,31 +298,36 @@
 					alert('cancelReservationServlet 호출 실패');
 				}
 			})
+
 	}
 
 	function appendReservation() { // 예약등록
-		$.ajax({
-			type : 'get',
-			url : 'appendReservation',
-			data : {
-				roomName : $('#roomName').val(),
-				roomType : $('#roomType').val(),
-				roomNum : $('#roomList option:selected').val(),
-				exp_Men : $('#exp_Men').val(),
-				stayLength : preTreat(),
-				totalFee : $('#totalFee').val(),
-				booker : $('#booker').val(),
-				mobile : $('#mobile').val()
-			},
-			success : function() {
-				init();
-				$('#btnReset').trigger('click');
-				$('#btnSearchAvailRoom').trigger('click');
-			},
-			error : function() {
-				alert('appendReservationServlet 호출 실패')
-			}
-		})
+		if ($('#roomList option:selected').text().split(' ')[2] >= $('#exp_Men')
+				.val())
+			$.ajax({
+				type : 'get',
+				url : 'appendReservation',
+				data : {
+					roomName : $('#roomName').val(),
+					roomType : $('#roomType').val(),
+					roomNum : $('#roomList option:selected').val(),
+					exp_Men : $('#exp_Men').val(),
+					stayLength : preTreat(),
+					totalFee : $('#totalFee').val(),
+					booker : $('#booker').val(),
+					mobile : $('#mobile').val()
+				},
+				success : function() {
+					init();
+					$('#btnReset').trigger('click');
+					$('#btnSearchAvailRoom').trigger('click');
+				},
+				error : function() {
+					alert('숙박기간을 설정해주세요')
+				}
+			})
+		else
+			alert('숙박가능인원을 초과했습니다.')
 	}
 
 	function init() {
@@ -348,7 +367,7 @@
 				displayAvailRoom(data);
 			},
 			error : function() {
-				alert('loadAvailRoomServlet 호출 실패')
+				alert('숙박기간을 입력해주세요')
 			}
 		})
 	}
@@ -380,6 +399,36 @@
 							+ jo['roomType'] + ' ' + jo['availPerson'] + ' '
 							+ jo['fee'] + '</option>');
 		}
+	}
+
+	function validDate() {
+		let date1 = $('#searchStayLength1').val().split('-')
+		let date2 = $('#searchStayLength2').val().split('-')
+		let date3 = date1[0] + date1[1] + date1[2];
+		let date4 = date2[0] + date2[1] + date2[2];
+		console.log(date3 + ' ' + date4)
+		if (date3 > date4 || date3 < getToday() || date4 < getToday())
+			return true;
+		return false;
+	}
+
+	function getToday() {
+		let date = new Date();
+		let year = date.getFullYear();
+		let month = ("0" + (1 + date.getMonth())).slice(-2);
+		let day = ("0" + date.getDate()).slice(-2);
+
+		return year + month + day;
+	}
+
+	function validReservation() {
+		if ($('#exp_Men').val() <= 0)
+			return true;
+		if ($('#booker').val() == '')
+			return true;
+		if ($('#mobile').val() == '')
+			return true;
+		return false;
 	}
 
 	function preTreat() {

@@ -34,6 +34,7 @@ public class loadAvailRoomServlet extends HttpServlet {
 			throws ServletException, IOException {
 		response.setContentType("text/html; charset=utf-8");
 		String stayLength = request.getParameter("stayLength");
+		System.out.println(stayLength);
 		int exp_Men = Integer.parseInt(request.getParameter("exp_Men"));
 		String roomType = request.getParameter("roomType");
 		reservationDTO rDTO = new reservationDTO(stayLength, exp_Men, roomType);
@@ -55,6 +56,11 @@ public class loadAvailRoomServlet extends HttpServlet {
 		response.getWriter().print(ja.toJSONString());
 	}
 
+	private String preTreat(String stayLength) {
+		
+		return stayLength;
+	}
+	
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
